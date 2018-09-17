@@ -2,13 +2,13 @@ const express = require('express');
 const mongoose = require('mongoose');
 const bodyParser = require('body-parser');
 const config = require("./config/config").get(process.env.NODE_ENV);
+const app = express();
 
 const PostRouter = require('./api/routes/posts');
 
 mongoose.Promise = global.Promise;
 mongoose.connect(config.DATABASE);
 
-const app = express();
 app.use(bodyParser.json());
 
 app.use("/api", PostRouter);
