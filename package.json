@@ -1,0 +1,15 @@
+{
+  "name": "drybbble",
+  "version": "1.0.0",
+  "description": "dribbble clone created with Nodejs/Express/Either react or vue for the view layer",
+  "main": "index.js",
+  "author": "Dion Pettaway",
+  "license": "MIT",
+  "dependencies": {
+    "body-parser": "1.18.3",
+    "express": "4.16.3"
+  },
+  "scripts": {
+    "start": "node server.js"
+  }
+}
