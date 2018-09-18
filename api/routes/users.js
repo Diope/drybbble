@@ -1,27 +1,39 @@
-const express = require('express');
-const bcrypt = require('bcrypt');
+const express = require("express");
+const bcrypt = require("bcrypt");
 const router = express.Router();
 
-const {User} = require('../../models/User');
+const { User } = require("../../models/User");
 
-const SALT_ROUNDS = 13;
+const SALT_ROUNDS = 14;
 
-router.post('/register', (req, res) => {
-  const user = new User({
-    username: req.body.username,
-    email: req.body.email,
-    password: req.body.password
-  });
-  bcrypt.hash(user.password, SALT_ROUNDS, (err, hash) => {
-    User.create({
-      username: user.username,
-      email: user.email,
-      password: hash
-    })
-    .then((result) => {res.status(200).json({message: "Saved success", result})})
-    .catch((err) => {res.status(400).json({message: err.message})})
-  })
-  
+router.post("/register", (req, res) => {
+  User.find({ email: req.body.email })
+    .exec()
+    .then(user => {
+      if (user >= 1) {
+        res
+          .status(409)
+          .json({
+            message: `The email ${
+              req.body.email
+            } is already in use, pleas try another email.`
+          });
+      } else {
+        const user = new User({
+          username: req.body.username,
+          email: req.body.email,
+          password: req.body.password
+        });
+        user
+          .save()
+          .then(result => {
+            res.status(200).json({ message: "User created" });
+          })
+          .catch(err => {
+            res.status(409).json({message: "Email already in use"});
+          });
+      }
+    });
 });
 
 module.exports = router;
