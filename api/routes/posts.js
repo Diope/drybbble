@@ -4,12 +4,25 @@ const router = express.Router();
 const {Post} = require('../../models/Post');
 const {User} = require('../../models/User');
 
+
+// GET:
 router.get('/shots', (req, res) => {
   Post.find({}).limit(20).exec((err, results) => {
     if (err) return res.status(400).json({message: "There is an error", err})
     res.status(200).send(results)
   })
 });
+
+router.get('/shots/:slug', (req, res) => {
+  let slug = req.params.slug;
+  console.log(slug)
+  Post.findBySlug({slug: slug}).exec((err, result) => {
+    if (err) return res.status(400).json({message: "Post does not exist or has been deleted by the user"})
+    res.status(200).send(result)
+  })
+})
+
+// POST:
 
 router.post('/shots/new', (req, res) => {
   const post = new Post({
@@ -21,14 +34,7 @@ router.post('/shots/new', (req, res) => {
     .catch(err => res.status(400).json({message: err.message}))
 })
 
-router.get('/shots/:slug', (req, res) => {
-  let slug = req.params.slug;
-  console.log(slug)
-  Post.findBySlug({slug: slug}).exec((err, result) => {
-    if (err) return res.status(400).json({message: "Post does not exist or has been deleted by the user"})
-    res.status(200).send(result)
-  })
-})
+// UPDATE:
 
 router.put('/shots/:id', (req, res) => {
   let id = req.params.id
@@ -37,5 +43,15 @@ router.put('/shots/:id', (req, res) => {
     res.status(200).send(result)
   })
 });
+
+// DELETE:
+
+router.delete('/shots/:id', (req, res) => {
+  let id = req.params.id
+  Post.findByIdAndRemove({_id: id}, (err, result) => {
+    if (err) res.status(400).json({message: "Uh oh it seems this shot does not exist or has already been deleted!"})
+    res.status(400).json({message: "Your shot has been deleted."})
+  })
+})
 
 module.exports = router;

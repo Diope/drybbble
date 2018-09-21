@@ -6,7 +6,7 @@ const PostSchema = new Schema({
   title: {type: String, required: true, minlength: 3, maxlength: 60},
   body: {type: String, required: true, minlength: 3, maxlength: 240},
   comments: [{type: Schema.Types.ObjectId, ref: 'Comment'}],
-  user: [{type: Schema.Types.ObjectId, ref: 'User'}]
+  user: {type: Schema.Types.ObjectId, $ref: 'User'}
 }, {timestamps: true});
 
 
