@@ -30,13 +30,22 @@ const UserSchema = new Schema({
   }
 }, {timestamps: true});
 
+// PRE & POST:
+
 UserSchema.pre('save', function(next) {
   var user = this;
-  bcrypt.hash(user.password, SALT_ROUNDS, function(err, hash){
-    if (err) throw new Error(err)
-    user.password = hash;
-    next();
-  })
+  if(user.isModified('password')) {
+    bcrypt.genSalt(SALT_ROUNDS, function(err, salt) {
+      if (err) return next(err)
+      bcrypt.hash(user.password, salt, function(err, hash){
+        if (err) throw new Error(err)
+        user.password = hash;
+        next();
+      })
+    })
+  } else {
+    next()
+  }
 });
 
 UserSchema.post('save', function(err, doc, next) {
@@ -47,6 +56,23 @@ UserSchema.post('save', function(err, doc, next) {
     next(err);
   }
 });
+
+UserSchema.post('save', function(err, doc, next) {
+  var user = this;
+  if (user.username) {
+    next(new Error(`The username ${user.username} is already in use, please choose another username`))
+  } else {
+    next(err)
+  }
+})
+
+// METHODS:
+UserSchema.methods.comparePassword = function comparePassword(candidatePass, cb) {
+  bcrypt.compare(candidatePass, this.password, function(err, isMatch){
+    if (err) return cb(err);
+    cb(null, isMatch);
+  })
+}
 
 const User = mongoose.model('User', UserSchema)
 module.exports = {User}
