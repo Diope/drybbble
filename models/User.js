@@ -1,5 +1,12 @@
 const mongoose = require("mongoose");
 const bcrypt = require('bcrypt');
+const fs = require('fs');
+const path = require('path');
+const jwt = require('jsonwebtoken');
+
+const privateKey = fs.readFileSync(path.join(__dirname, '../config') + '/private.key', 'utf8')
+const publicKey = fs.readFile(path.join(__dirname, '../config') + '/public.key', 'utf8');
+
 const Schema = mongoose.Schema;
 
 const SALT_ROUNDS = 13;
@@ -67,11 +74,34 @@ UserSchema.post('save', function(err, doc, next) {
 })
 
 // METHODS:
+
 UserSchema.methods.comparePassword = function comparePassword(candidatePass, cb) {
   bcrypt.compare(candidatePass, this.password, function(err, isMatch){
     if (err) return cb(err);
     cb(null, isMatch);
   })
+}
+
+UserSchema.methods.generateJWT = function(cb) {
+  var user = this
+  var issuer = 'dipet.me'
+  var subject = user.email
+
+  var payload = {
+    data1: user._id,
+    data2: user.username,
+    data3: user.email
+  }
+
+  var signOptions = {
+    issuer: issuer,
+    subject: subject,
+    expiresIn: '15d',
+    algorithm: "RS256"
+  }
+  
+  var token = jwt.sign(payload, privateKey, signOptions)
+  cb(null, token)
 }
 
 const User = mongoose.model('User', UserSchema)
