@@ -5,7 +5,6 @@ const path = require('path');
 const jwt = require('jsonwebtoken');
 
 const privateKey = fs.readFileSync(path.join(__dirname, '../config') + '/private.key', 'utf8')
-const publicKey = fs.readFile(path.join(__dirname, '../config') + '/public.key', 'utf8');
 
 const Schema = mongoose.Schema;
 
@@ -17,7 +16,7 @@ const UserSchema = new Schema({
     required: true,
     minlength: [3, "Username must be at least 3 characters long"],
     maxlength: [25, "Username must be no longer than 25 characters"],
-    index: true,
+    index: [true, "Username is already in use, please try another"],
     trim: true
   },
   email: {
@@ -34,7 +33,8 @@ const UserSchema = new Schema({
     type: String,
     required: true,
     minlength: 6,
-  }
+  },
+  posts: [{type: Schema.Types.ObjectId, ref: 'Post'}]
 }, {timestamps: true});
 
 // PRE & POST:
@@ -66,8 +66,10 @@ UserSchema.post('save', function(err, doc, next) {
 
 UserSchema.post('save', function(err, doc, next) {
   var user = this;
-  if (user.username) {
-    next(new Error(`The username ${user.username} is already in use, please choose another username`))
+  if (user.username.length >= 2) {
+    next(new Error(`The username ${user.username} is too short, the minimum acceptable character length is 3`))
+  } else if (user.username) {
+    next(new Error(`The username ${user.username} is already in use, please try another username.`))
   } else {
     next(err)
   }
@@ -84,18 +86,15 @@ UserSchema.methods.comparePassword = function comparePassword(candidatePass, cb)
 
 UserSchema.methods.generateJWT = function(cb) {
   var user = this
-  var issuer = 'dipet.me'
-  var subject = user.email
 
   var payload = {
-    data1: user._id,
-    data2: user.username,
-    data3: user.email
+    id: user._id,
+    username: user.username,
+    email: user.email
   }
 
   var signOptions = {
-    issuer: issuer,
-    subject: subject,
+    issuer: 'dipet.me',
     expiresIn: '15d',
     algorithm: "RS256"
   }
@@ -103,6 +102,13 @@ UserSchema.methods.generateJWT = function(cb) {
   var token = jwt.sign(payload, privateKey, signOptions)
   cb(null, token)
 }
+
+// VIRTUAL:
+
+UserSchema.virtual('postCount').get(function() {
+  return this.posts.length
+});
+
 
 const User = mongoose.model('User', UserSchema)
 module.exports = {User}

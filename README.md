@@ -2,6 +2,7 @@
 
 This serves as a repository for my Dribbble clone made with MongoDB/Express/React.JS/Node.js. I have previously recreated Dribbble, calling it [Drubbble](https://github.com/diope/drubbble) using Rails 4.2 back in 2016-2017 (I will be updating that to Rails 5 in the coming weeks). I'm starting Drybbble from pure scratch and building up using the least amount of packages as possible trying my best to problem solve and create the necessary functinoality from scratch, I'll try to remember to make a new git branch when working on different features but I jump around a lot. 
 
+### Important Note
 Feel free to clone and use for your own use. In order for authentication to work, you will need to add two files to the config file. `private.key` & `public.key` then head over to [RSA Generator](http://travistidwell.com/jsencrypt/demo/) and copy and paste the output to the respective files, to include the key headers.
 
 ## Intended 1.0 features

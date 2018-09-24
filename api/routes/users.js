@@ -1,26 +1,22 @@
 const express = require("express");
-const bcrypt = require("bcrypt");
 const router = express.Router();
+const auth = require('../middleware/auth')
 
 const { User } = require("../../models/User");
 
 router.post("/register", (req, res) => {
   User.create(req.body)
-    .then(result =>
-      res
-        .status(200)
-        .json({
-          message: `You have been signed up with the username ${
-            result.username
-          }!`
-        })
+    .then(user =>
+      res.status(200).json({
+          message: `You have been signed up with the username ${user.username}!`
+      })
     )
     .catch(err => res.status(409).json({ message: err.message }));
 });
 
-router.post("/login", (req, res, next) => {
+router.post("/login", (req, res) => {
   User.findOne({ username: req.body.username }, function(err, user) {
-    if (user.length > 1) {
+    if (!user) {
       return res
         .status(400)
         .json({
@@ -35,13 +31,10 @@ router.post("/login", (req, res, next) => {
           message: "Authentication failed, password is incorrect"
         });
       } else {
-        res.status(200).json({ message: "Logged in successfully" });
         user.generateJWT((err, token) => {
-          console.log({
-            user: user.username,
-            token: token
-          });
-        });
+          if (err) res.status(400).json({message: err.message})
+          res.status(200).json({ message: "Logged in successfully", token: token });
+        })
       }
     });
   });
@@ -49,13 +42,13 @@ router.post("/login", (req, res, next) => {
 
 // DELETE:
 
-router.delete("/:id", (req, res) => {
+router.delete("/:id", auth, (req, res) => {
   const id = req.params.id;
   User.findByIdAndRemove({ _id: id }, (err, result) => {
     if (err) return res.status(400).json({ message: err.error });
     res
       .status(200)
-      .json({ message: "Your account has been successfully deleted" });
+      .json({ message: "Sorry to see you go! Your account has been successfully deleted" });
   });
 });
 

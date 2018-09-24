@@ -3,10 +3,10 @@ const slugHero = require('mongoose-slug-hero');
 const Schema = mongoose.Schema;
 
 const PostSchema = new Schema({
-  title: {type: String, required: true, minlength: 3, maxlength: 60},
-  body: {type: String, required: true, minlength: 3, maxlength: 240},
+  title: {type: String, required: true, minlength: 3, maxlength: 60, required: true},
+  body: {type: String, required: true, minlength: 3, maxlength: 240, required: true},
   comments: [{type: Schema.Types.ObjectId, ref: 'Comment'}],
-  user: {type: Schema.Types.ObjectId, $ref: 'User'}
+  user: {type: Schema.Types.ObjectId, ref: 'User'}
 }, {timestamps: true});
 
 
