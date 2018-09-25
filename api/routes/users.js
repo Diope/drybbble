@@ -4,6 +4,8 @@ const auth = require('../middleware/auth')
 
 const { User } = require("../../models/User");
 
+
+// POST:
 router.post("/register", (req, res) => {
   User.create(req.body)
     .then(user =>
@@ -39,6 +41,21 @@ router.post("/login", (req, res) => {
     });
   });
 });
+
+// GET:
+router.get('/:user', (req, res) => {
+  let user = req.params.user
+  User.find({username: user}).populate('posts')
+  .then((user) => {
+    console.log(user[0].username)
+    if (user[0].posts.length < 1) {
+      res.status(400).json({message: `${user[0].username} has yet to post up any shots!`})
+    } else {
+      res.status(200).json(user[0].posts)
+    }
+  })
+})
+
 
 // DELETE:
 

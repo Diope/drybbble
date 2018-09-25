@@ -8,6 +8,7 @@ const auth = require('../middleware/auth')
 
 
 // GET:
+  // All Shots
 router.get('/shots', (req, res) => {
   Post.find({}).limit(20).exec((err, results) => {
     if (err) return res.status(400).json({message: "There is an error", err})
@@ -15,77 +16,58 @@ router.get('/shots', (req, res) => {
   })
 });
 
-router.get('/shots/:slug', (req, res) => {
-  let slug = req.params.slug;
-  Post.find({slug: slug}).exec((err, result) => {
-    if (!result) return res.status(400).json({message: "Shot does not exist or has been deleted by the user"}) 
-    res.status(200).json(result)
+  // Individal
+router.get('/:slug', (req, res) => {
+  const slug = req.params.slug;
+  Post.find({slug: slug}, (err, post) => {
+    if (post.length === 0) {
+      return res.status(400).json({message: "Shot does not exist, perhaps it has been deleted?"})
+    }
+    res.status(200).json(post)
   })
 })
 
 // POST:
 
-router.post('/shots/new', auth, (req, res) => {
+  // New
+router.post('/new', auth, (req, res) => {
   console.log(req.user.id)
-  User.findById(req.user.id, (err, user) => {
-    if (err) res.status(400).json({message: err})
+  User.findById(req.user.id).then((user) => {
+    console.log(req.body.title)
     const newPost = {
       title: req.body.title,
       body: req.body.body,
       user: req.user.id
     }
-    Post.create(newPost, (err, post) => {
-      if (err) res.status(400).json({message: "Your shot could not be created"})
-      // user.posts.push(post)
+    Post.create(newPost).then((post) => {
+      console.log(user.posts)
+      user.posts.push(post)
       user.save()
-        .then((result) => {
-          res.status(200).json(result)
-        })
-        .catch((err) => {
-          res.status(400).json(err)
-        })
-      })
+      .then((result) => res.status(200).json({message: "Shot successful!"}))
+      .catch((err) => res.status(400).json(err))
+    })
+    .catch((err) => res.status(200).json(err))
   })
-  // User.findById(req.body.user, (err, user) => {
-  //   if (err) res.status(400).json({message: err.message})
-  //   // console.log(user)
-  //   const newPost = {
-  //     title: req.body.title,
-  //     body: req.body.body,
-  //     user: user.id
-  //   }
-  //   // console.log(newPost)
-  //   Post.create(newPost, (err, post) => {
-
-  //     if (err) res.status(400).json({message2: err})
-  //     user.posts.push(post)
-  //     user.save()
-  //       .then((result) => {
-  //         res.status(200).json(result)
-  //       })
-  //       .catch((err) => {
-  //         res.status(400).json(err)
-  //       })
-  //   })
-  // })
+  .catch((err) => res.status(200).json(err))
 })
 
-router.get('/shots/u/:user', (req, res) => {
-  let user = req.params.user
-  User.find({username: user}).populate('posts')
-  .then((user) => {
-    console.log(user[0].username)
-    if (user[0].posts.length < 1) {
-      res.status(400).json({message: `${user[0].username} has yet to post up any shots!`})
-    } else {
-      res.status(200).json(user[0].posts)
-    }
-  })
+router.post('/comment/:id', auth, (req, res) => {
+  let id = req.params.id;
+  User.findById(req.user.id).then((user) => {
+    Post.find({_id: id}).then((post) => {
+      console.log(post[0])
+      const comment = {
+        body: req.body.body,
+        user: req.user.id
+      }
+      post[0].comments.unshift(comment)
+      post[0].save().then((result) => res.json(result))
+    }).catch((err) => console.log(err))
+  }).catch((err) => res.status(200).json({message: "Error 2"}))
 })
 
 // UPDATE:
-
-router.put('/shots/:slug', auth, (req, res) => {
+router.put('/:slug', auth, (req, res) => {
   let slug = req.params.slug
   User.findById(req.user.id, (err, user) => {
     Post.find({slug: slug}).then((post) => {
@@ -105,7 +87,7 @@ router.put('/shots/:slug', auth, (req, res) => {
 
 // DELETE:
 
-router.delete('/shots/:id', auth, (req, res) => {
+router.delete('/:id', auth, (req, res) => {
   let id = req.params.id
   User.findById(req.user.id, (err, user) => {
     Post.findOneAndDelete({_id: id}).then((post) => {
