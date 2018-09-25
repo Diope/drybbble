@@ -48,7 +48,7 @@ router.delete("/:id", auth, (req, res) => {
     if (err) return res.status(400).json({ message: err.error });
     res
       .status(200)
-      .json({ message: "Sorry to see you go! Your account has been successfully deleted" });
+      .json({ message: "Sorry to see you go! Your account has been successfully deleted" })
   });
 });
 

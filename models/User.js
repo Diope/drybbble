@@ -33,8 +33,7 @@ const UserSchema = new Schema({
     type: String,
     required: true,
     minlength: 6,
-  },
-  posts: [{type: Schema.Types.ObjectId, ref: 'Post'}]
+  }
 }, {timestamps: true});
 
 // PRE & POST:
