@@ -35,6 +35,10 @@ PostSchema.pre('sav', function(next) {
   
 })
 
+PostSchema.virtual('postLikes').get(function() {
+  return this.likes.length;
+})
+
 function convertToSlug(text) {
   // console.log(text.replace(/\s+/g, '-'))
   return text.toString().toLowerCase()

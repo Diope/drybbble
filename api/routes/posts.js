@@ -6,10 +6,11 @@ const {User} = require('../../models/User');
 
 const auth = require('../middleware/auth')
 
+// URL -> localhost:3851/api
 
 // GET:
   // All Shots
-router.get('/shots', (req, res) => {
+router.get('/', (req, res) => {
   Post.find({}).limit(20).exec((err, results) => {
     if (err) return res.status(400).json({message: "There is an error", err})
     res.status(200).send(results)
@@ -87,16 +88,16 @@ router.put('/:slug', auth, (req, res) => {
 
 // DELETE:
 
-router.delete('/:id', auth, (req, res) => {
-  let id = req.params.id
+router.delete('/:slug', auth, (req, res) => {
+  let slug = req.params.slug
   User.findById(req.user.id, (err, user) => {
-    Post.findOneAndDelete({_id: id}).then((post) => {
+    Post.findOneAndDelete({slug: slug}).then((post) => {
       console.log(post)
       if (post.user.toString() !== req.user.id) {
         res.status(400).json({message: "You are not authorized to edit this shot!"})
       }
        res.status(200).json({message: "Your shot has been deleted!"})
-    }).catch((err) => console.log("Could not find post, perhaps it's been deleted?"))
+    }).catch((err) => res.status(400).json("Could not find post, perhaps it's been deleted?"))
   })
 
   // Post.findByIdAndRemove({_id: id}, (err, result) => {

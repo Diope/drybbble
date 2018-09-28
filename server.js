@@ -20,8 +20,8 @@ app.use((req, res, next) => {
   next();
 });
 
-app.use("/api", UserRouter);
-app.use("/api/shots", PostRouter);
+app.use("/api/u", UserRouter);
+app.use("/api", PostRouter);
 
 const PORT = process.env.PORT || 3851;
 app.listen(PORT, () => {

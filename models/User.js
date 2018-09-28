@@ -5,10 +5,10 @@ const path = require('path');
 const jwt = require('jsonwebtoken');
 
 const privateKey = fs.readFileSync(path.join(__dirname, '../config') + '/private.key', 'utf8')
+const SALT_ROUNDS = 13;
 
 const Schema = mongoose.Schema;
 
-const SALT_ROUNDS = 13;
 
 const UserSchema = new Schema({
   username: {
@@ -17,6 +17,7 @@ const UserSchema = new Schema({
     minlength: [3, "Username must be at least 3 characters long"],
     maxlength: [25, "Username must be no longer than 25 characters"],
     index: [true, "Username is already in use, please try another"],
+    unique: true,
     trim: true
   },
   email: {
@@ -33,8 +34,21 @@ const UserSchema = new Schema({
     type: String,
     required: true,
     minlength: 6,
+    required: true
   },
-  posts: [{type: Schema.Types.ObjectId, ref: 'Post'}]
+  posts: [{type: Schema.Types.ObjectId, ref: 'Post'}],
+  profile: {
+    bio: {type: String},
+    website: {type: String, validate: [
+      /^((https?|ftp|smtp):\/\/)?(www.)?[a-z0-9]+\.[a-z]+(\/[a-zA-Z0-9#]+\/?)*$/,  "URL not valid, please enter a valid URL"
+      ],
+      lowercase: true,
+      trim: true
+    },
+    forHire: {type: Boolean, default: false},
+    location: {type: String, maxlength: 40 },
+    bio: {type: String, maxlength: 500}
+  }
 }, {timestamps: true});
 
 // PRE & POST:
@@ -57,23 +71,28 @@ UserSchema.pre('save', function(next) {
 
 UserSchema.post('save', function(err, doc, next) {
   var user = this;
-  if (err.name === 'MongoError' && err.code === 11000) {
-    next(new Error(`The email ${user.email} is already in use, please use another email`));
-  } else {
-    next(err);
+  if (user.isModified('username')) {
+    if (user.username.length <= 2) {
+      next(new Error("The username must be at least 3 characters in length"))
+    } else {
+      next()
+    }
   }
-});
+})
 
 UserSchema.post('save', function(err, doc, next) {
   var user = this;
-  if (user.username.length >= 2) {
-    next(new Error(`The username ${user.username} is too short, the minimum acceptable character length is 3`))
-  } else if (user.username) {
-    next(new Error(`The username ${user.username} is already in use, please try another username.`))
-  } else {
-    next(err)
+  var email = new RegExp(/^((https?|ftp|smtp):\/\/)?(www.)?[a-z0-9]+\.[a-z]+(\/[a-zA-Z0-9#]+\/?)*$/);
+  if (user.isModified('email')) {
+    if (email.test(user.email) === false) {
+      next(new Error(`The email ${user.email} is not a valid email, please enter a valid email`))
+    } else {
+      next()
+    }
   }
 })
+
+
 
 // METHODS:
 
@@ -108,6 +127,8 @@ UserSchema.methods.generateJWT = function(cb) {
 UserSchema.virtual('postCount').get(function() {
   return this.posts.length
 });
+
+
 
 
 const User = mongoose.model('User', UserSchema)
