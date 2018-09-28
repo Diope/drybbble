@@ -4,6 +4,12 @@ const Schema = mongoose.Schema;
 const PostSchema = new Schema({
   title: {type: String, required: true, minlength: 3, maxlength: 60},
   body: {type: String, required: true, minlength: 3, maxlength: 500},
+  userShot: [
+    {
+      url: {type: String},
+      public_id: {type: String}
+    }
+  ],
   comments: [
     {
       user: {type: Schema.Types.ObjectId, ref: 'User' },

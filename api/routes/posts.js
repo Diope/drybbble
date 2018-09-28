@@ -3,9 +3,27 @@ const router = express.Router();
 
 const {Post} = require('../../models/Post');
 const {User} = require('../../models/User');
+const auth = require('../middleware/auth');
 
-const auth = require('../middleware/auth')
+const multer = require("multer");
+const cloudinary = require("cloudinary");
+const cloudinaryStorage = require("multer-storage-cloudinary");
+const cloudConfig = require('../../config/cloudinary');
 
+cloudinary.config({
+  cloud_name: cloudConfig.cloud_name,
+  api_key: cloudConfig.api_key,
+  api_secret: cloudConfig.api_secret
+})
+
+const storage = cloudinaryStorage({
+  cloudinary: cloudinary,
+  folder: 'drybbble_uploads',
+  allowed_formats: ['jpeg', 'png', 'gif'],
+  transformation: [{ width: 900, crop: "scale" }]
+})
+
+const parser = multer({storage: storage})
 // URL -> localhost:3851/api
 
 // GET:
@@ -31,17 +49,16 @@ router.get('/:slug', (req, res) => {
 // POST:
 
   // New
-router.post('/new', auth, (req, res) => {
-  console.log(req.user.id)
+router.post('/new', auth, parser.single('userShot'), (req, res) => {
+  console.log(req.file)
   User.findById(req.user.id).then((user) => {
-    console.log(req.body.title)
     const newPost = {
       title: req.body.title,
       body: req.body.body,
-      user: req.user.id
+      user: req.user.id,
+      userShot: {url: req.file.url, public_id: req.file.public_id}
     }
     Post.create(newPost).then((post) => {
-      console.log(user.posts)
       user.posts.push(post)
       user.save()
       .then((result) => res.status(200).json({message: "Shot successful!"}))

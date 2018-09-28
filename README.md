@@ -10,12 +10,18 @@ Feel free to clone and use for your own use. In order for authentication to work
 The intended features on first go around are as follows:
   - The basic login/logout system
   - Ability to make a post with an image
-  - Ability to like a post
   - Ability to leave comments
 
 If possible much like my Rails Dribbble clone, I will look into account information being auto populated after username creation.
 
 ## Changelog
+
+### Sept 27:
+* Refactored register route, having route (will pull out and make controller later) to handle validation before DB validation kicks in
+
+### Sept 25:
+* Refactored Post GET route to account for entering the wrong slug.
+* Added ability to leave comments on posts.
 
 ### Sept 22:
 * Added JWT token passing to login API endpoint
@@ -30,7 +36,7 @@ If possible much like my Rails Dribbble clone, I will look into account informat
 * Added slug to post, and the ability to retrieve a post by supplying the slug. Also added the basic comment model.
 * Added delete user route
 
-Sept 17th:
+### Sept 17th:
 * Initial Commit
 * Basic post model created (title, content)
 * Added first post route (POST)
