@@ -16,6 +16,10 @@ If possible much like my Rails Dribbble clone, I will look into account informat
 
 ## Changelog
 
+### Sept 28:
+* Image uploading has been added for posts, using Cloudinary for image hosting in lieu of storing locally. Unfortunately I'm having issues in regards to updating the user profile, avatar and background. 
+
+
 ### Sept 27:
 * Refactored register route, having route (will pull out and make controller later) to handle validation before DB validation kicks in
 
