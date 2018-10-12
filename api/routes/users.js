@@ -4,6 +4,26 @@ const auth = require('../middleware/auth')
 
 const { User } = require("../../models/User");
 
+const multer = require("multer");
+const cloudinary = require("cloudinary");
+const cloudinaryStorage = require("multer-storage-cloudinary");
+const cloudConfig = require('../../config/cloudinary');
+
+cloudinary.config({
+  cloud_name: cloudConfig.cloud_name,
+  api_key: cloudConfig.api_key,
+  api_secret: cloudConfig.api_secret
+})
+
+const storage = cloudinaryStorage({
+  cloudinary: cloudinary,
+  folder: 'drybbble_uploads/avatars',
+  allowed_formats: ['jpeg', 'png', 'gif'],
+  transformation: [{ width: 90, height: 90, crop: "imagga_scale" }]
+})
+
+const parser = multer({storage: storage})
+
 // URL -> localhost:3851/api/u
 
 // POST:
@@ -66,15 +86,26 @@ router.get('/:user', (req, res) => {
 
 // Update Profile
 
-router.put('/:id', auth, (req, res) => {
+router.put('/:id', auth, parser.single('profile'), (req, res) => {
   User.findByIdAndUpdate({_id: req.params.id}).then((user) => {
     console.log(user)
     if (user.id !== req.user.id) {
       return res.status(400).json({message: "You are not authorized to edit this User profile."})
     }
+    console.log(req.file);
+    // const profileImg = {
+    //   profile:{avatar: [{url: req.file.url, public_id: req.file.public_id}]}
+    // }
+
+    // console.log(profileImg)
+    // console.log(profileImg)
+    // const backgroundImg = {
+    //   profile: {background: {url: req.file[1].url, public_id: req.file[1].public_id}}
+    // }
     user.update(req.body).then(result => console.log(result))
   }).catch(err => console.log(err.message))
 })
+
 
 
 // DELETE:

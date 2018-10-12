@@ -38,7 +38,6 @@ const UserSchema = new Schema({
   },
   posts: [{type: Schema.Types.ObjectId, ref: 'Post'}],
   profile: {
-    bio: {type: String},
     website: {type: String, validate: [
       /^((https?|ftp|smtp):\/\/)?(www.)?[a-z0-9]+\.[a-z]+(\/[a-zA-Z0-9#]+\/?)*$/,  "URL not valid, please enter a valid URL"
       ],
@@ -47,7 +46,16 @@ const UserSchema = new Schema({
     },
     forHire: {type: Boolean, default: false},
     location: {type: String, maxlength: 40 },
-    bio: {type: String, maxlength: 500}
+    bio: {type: String, maxlength: 500},
+    avatar:
+      {
+        url: {type: String, default: "/static/img/defaultAvatar.png" }, 
+        public_id: {type: String}
+      },
+    background: {
+      url:{type: String, default: "/static/img/defaultBG.png"},
+      public_id: {type: String}
+    }
   }
 }, {timestamps: true});
 
@@ -120,6 +128,11 @@ UserSchema.methods.generateJWT = function(cb) {
   
   var token = jwt.sign(payload, privateKey, signOptions)
   cb(null, token)
+}
+
+UserSchema.methods.deleteToken = function(cb) {
+  var user = this;
+  
 }
 
 // VIRTUAL:

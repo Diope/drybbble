@@ -8,7 +8,7 @@ const PostSchema = new Schema({
     {
       url: {type: String},
       public_id: {type: String}
-    }
+    }, {required: true}
   ],
   comments: [
     {
@@ -20,7 +20,7 @@ const PostSchema = new Schema({
   ],
   slug: {type: String, index: true},
   likes: [{ user: {type: Schema.Types.ObjectId, ref: 'User'}}],
-  user: {type: Schema.Types.ObjectId, ref: 'User'}
+  user: {type: Schema.Types.ObjectId, ref: 'User', required: true}
 }, {timestamps: true});
 
 

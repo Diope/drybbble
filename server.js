@@ -2,6 +2,7 @@ const express = require("express");
 const mongoose = require("mongoose");
 const bodyParser = require("body-parser");
 const config = require("./config/config").get(process.env.NODE_ENV);
+const path = require('path');
 const app = express();
 
 const PostRouter = require("./api/routes/posts");
@@ -19,6 +20,7 @@ app.use((req, res, next) => {
   );
   next();
 });
+app.use(express.static(path.resolve(__dirname, '../dist')))
 
 app.use("/api/u", UserRouter);
 app.use("/api", PostRouter);

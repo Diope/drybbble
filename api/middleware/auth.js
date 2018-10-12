@@ -11,8 +11,10 @@ const signOptions = {
 
 module.exports = (req, res, next) => {
   const tokenSent = req.headers.authorization
+  // console.log(tokenSent);
   if (tokenSent) {
     const token = tokenSent.split(" ")[1]
+    // console.log(token);
     jwt.verify(token, publicKey, signOptions, (err, decoded) => {
       req.user = decoded
       next()
