@@ -33,8 +33,7 @@ const UserSchema = new Schema({
   password: {
     type: String,
     required: true,
-    minlength: 6,
-    required: true
+    minlength: 6
   },
   posts: [{type: Schema.Types.ObjectId, ref: 'Post'}],
   profile: {
@@ -46,16 +45,17 @@ const UserSchema = new Schema({
     },
     forHire: {type: Boolean, default: false},
     location: {type: String, maxlength: 40 },
-    bio: {type: String, maxlength: 500},
-    avatar:
-      {
-        url: {type: String, default: "/static/img/defaultAvatar.png" }, 
-        public_id: {type: String}
-      },
-    background: {
-      url:{type: String, default: "/static/img/defaultBG.png"},
+    bio: {type: String, maxlength: 500}
+  },
+  avatar: [
+    {
+      url: {type: String, default: '/static/img/defaultAvatar.png'},
       public_id: {type: String}
     }
+  ],
+  background: {
+    url:{type: String, default: "/static/img/defaultBG.png"},
+    public_id: {type: String}
   }
 }, {timestamps: true});
 

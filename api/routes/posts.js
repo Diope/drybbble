@@ -35,7 +35,7 @@ router.get('/', (req, res) => {
   })
 });
 
-  // Individal
+  // Individual
 router.get('/:slug', (req, res) => {
   const slug = req.params.slug;
   Post.find({slug: slug}, (err, post) => {
@@ -50,7 +50,8 @@ router.get('/:slug', (req, res) => {
 
   // New
 router.post('/new', auth, parser.single('userShot'), (req, res) => {
-  console.log(req.file)
+
+  console.log(req.body)
   User.findById(req.user.id).then((user) => {
     const newPost = {
       title: req.body.title,
@@ -84,45 +85,63 @@ router.post('/comment/:id', auth, (req, res) => {
   }).catch((err) => res.status(200).json({message: "Error 2"}))
 })
 
-// UPDATE:
-router.put('/:slug', auth, (req, res) => {
-  let slug = req.params.slug
-  User.findById(req.user.id, (err, user) => {
-    Post.find({slug: slug}).then((post) => {
-      console.log(post[0].id)
-      if (post[0].user.toString() !== req.user.id) {
-        return res.status(200).json({message: "You are not authorized to edit this shot"})
-      }
-      post[0].title = req.body.title
-      post[0].body = req.body.body
-      // console.log(req.body)
-      post[0].save()
-      .then((result) => console.log(result))
-      .catch(err => console.log(err))
-    }).catch(err => res.status(400).json({message: "Shot does not exist"}))
-  })
-});
+// UPDATE: // find returns an array, findBy* returns an object. You cannot do PUT/PATCH requests with multer
+// router.put('/:id', auth, parser.single('userShot'), (req, res) => {
+//   let id = req.params.id
+//   console.log(req.file)
+//   User.findById(req.user.id, (err, user) => {
+//     Post.findById({_id: id}).then((post) => {
+//       if (post.user.toString() !== req.user.id) {
+//         return res.status(200).json({message: "You are not authorized to edit this shot"})
+//       }
+//       post.title = req.body.title
+//       post.body = req.body.body
+//       // post.userShot[0].url = req.file.url
+//       // post.userShot[0].public_id = req.file.public_id
+      
+//       // const userShot = {
+//       //   userShot: {url: req.file.url, public_id: req.file.public_id}
+//       // }
+
+//       // console.log(userShot)
+//       // console.log(post.userShot)
+//       // console.log(req.body)
+//       // post.save()
+//       //   .then((result) => console.log("yatta"))
+//       //   .catch(err => console.log(err.message))
+//     }).catch(err => console.log(err))
+//   })
+// });
 
 // DELETE:
 
-router.delete('/:slug', auth, (req, res) => {
+router.delete('/:slug', auth, async (req, res, next) => {
   let slug = req.params.slug
-  User.findById(req.user.id, (err, user) => {
-    Post.findOneAndDelete({slug: slug}).then((post) => {
-      console.log(post)
-      if (post.user.toString() !== req.user.id) {
-        res.status(400).json({message: "You are not authorized to edit this shot!"})
-      }
-       res.status(200).json({message: "Your shot has been deleted!"})
-    }).catch((err) => res.status(400).json("Could not find post, perhaps it's been deleted?"))
-  })
+  let _user = await User.findById(req.user.id)
+  let _post = await Post.findOne({slug: slug})
+  try {
+    if (! _post) {
+      return next({status: 401, message: "That shot could not be found, perhaps it has been deleted? 🤔"})
+    } else if (_user._id.toString() === _post.user.toString()) {
+      _post.remove()
+      return res.status(200).json({message: "Your shot has successfully been deleted"})
+    } else if (_user._id.toString() != _post.user.toString()) {
+      return next({status: 400, message: "You are not authorized to perform that action"})
+    }
+  } catch (err) {
+    next(err)
+  }
 
-  // Post.findByIdAndRemove({_id: id}, (err, result) => {
-  //   console.log(result)
-  //     if (!result) {
-  //       res.status(400).json({message: "Uh oh it seems this shot does not exist or has already been deleted!"})
+  // User.findById(req.user.id, (err, user) => {
+  //   Post.findOne({slug: slug}).then((post) => {
+  //     // console.log(post.user.toString() === req.user.id)
+  //     if (post.user.toString() !== req.user.id) {
+  //       res.status(400).json({message: "You are not authorized to edit this shot!"})
+  //     } else {
+  //       post.remove()
+  //       return res.status(200).json({message: "Your shot has been deleted!"})
   //     }
-  //   res.status(400).json({message: "Your shot has been deleted."})
+  //   }).catch((err) => res.status(400).json("Could not find post, perhaps it's been deleted?"))
   // })
 })
 

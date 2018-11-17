@@ -18,7 +18,7 @@ cloudinary.config({
 const storage = cloudinaryStorage({
   cloudinary: cloudinary,
   folder: 'drybbble_uploads/avatars',
-  allowed_formats: ['jpeg', 'png', 'gif'],
+  allowed_formats: ['jpeg', 'jpg', 'png', 'gif'],
   transformation: [{ width: 90, height: 90, crop: "imagga_scale" }]
 })
 
@@ -32,17 +32,17 @@ const parser = multer({storage: storage})
 router.post("/register", (req, res) => {
   const username = req.body.username
   const email = req.body.email
-  User.findOne({$or:[{username: username}, {email: email}]}, (err, result) => {
+  User.findOne({$or:[{username}, {email}]}, (err, result) => {
     if (null != result) {
-      if (req.body.email === result.email) {
-        res.status(409).json({message: `The email ${req.body.email} is already in use, please choose another`});
-      } else if (req.body.username === result.username) {
-        res.status(409).json({message: `The username ${req.body.username} is already in use, please choose another.`})
+      if (email === result.email) {
+        res.status(409).json({message: `The email ${email} is already in use, please choose another`});
+      } else if (username === result.username) {
+        res.status(409).json({message: `The username ${kusername} is already in use, please choose another.`})
       } 
     }
     User.create(req.body)
       .then(user => {res.status(200).json({
-            message: `You have been signed up with the username ${user.username}!`
+            message: `You have been signed up with the username ${username}!`
         })
       })
       .catch(err => res.status(409).json(err.message)); //<- THE .MESSAGE IS VERY IMPORTANT!!!
@@ -86,24 +86,8 @@ router.get('/:user', (req, res) => {
 
 // Update Profile
 
-router.put('/:id', auth, parser.single('profile'), (req, res) => {
-  User.findByIdAndUpdate({_id: req.params.id}).then((user) => {
-    console.log(user)
-    if (user.id !== req.user.id) {
-      return res.status(400).json({message: "You are not authorized to edit this User profile."})
-    }
-    console.log(req.file);
-    // const profileImg = {
-    //   profile:{avatar: [{url: req.file.url, public_id: req.file.public_id}]}
-    // }
-
-    // console.log(profileImg)
-    // console.log(profileImg)
-    // const backgroundImg = {
-    //   profile: {background: {url: req.file[1].url, public_id: req.file[1].public_id}}
-    // }
-    user.update(req.body).then(result => console.log(result))
-  }).catch(err => console.log(err.message))
+router.put('/:id', auth, parser.single('avatar'), (req, res) => {
+  console.log(req)
 })
 
 

@@ -5,6 +5,7 @@ const config = require("./config/config").get(process.env.NODE_ENV);
 const path = require('path');
 const app = express();
 
+const errorHandler = require('./api/middleware/errorHandler');
 const PostRouter = require("./api/routes/posts");
 const UserRouter = require("./api/routes/users");
 
@@ -24,6 +25,13 @@ app.use(express.static(path.resolve(__dirname, '../dist')))
 
 app.use("/api/u", UserRouter);
 app.use("/api", PostRouter);
+
+app.use((req, res, next) => {
+  let err = new Error("Whoops! Looks like something went horribly, horribly wrong here!");
+  err.status = 404;
+  next(err);
+});
+app.use(errorHandler);
 
 const PORT = process.env.PORT || 3851;
 app.listen(PORT, () => {
