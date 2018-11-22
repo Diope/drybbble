@@ -34,12 +34,12 @@ PostSchema.pre('save', function(next) {
   next()
 });
 
-PostSchema.pre('sav', function(next) {
-  var post = this;
-  console.log(post)
-  // console.log(post._update.$set.title)
+// PostSchema.pre('sav', function(next) {
+//   var post = this;
+//   console.log(post)
+//   // console.log(post._update.$set.title)
   
-})
+// })
 
 PostSchema.virtual('postLikes').get(function() {
   return this.likes.length;

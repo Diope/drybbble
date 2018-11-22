@@ -36,6 +36,7 @@ const UserSchema = new Schema({
     minlength: 6
   },
   posts: [{type: Schema.Types.ObjectId, ref: 'Post'}],
+  comments: [{type: Schema.Types.ObjectId, ref: 'Comment'}],
   profile: {
     website: {type: String, validate: [
       /^((https?|ftp|smtp):\/\/)?(www.)?[a-z0-9]+\.[a-z]+(\/[a-zA-Z0-9#]+\/?)*$/,  "URL not valid, please enter a valid URL"
@@ -130,10 +131,9 @@ UserSchema.methods.generateJWT = function(cb) {
   cb(null, token)
 }
 
-UserSchema.methods.deleteToken = function(cb) {
-  var user = this;
-  
-}
+// UserSchema.methods.deleteToken = function(cb) {
+//   var user = this;
+// }
 
 // VIRTUAL:
 

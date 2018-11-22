@@ -8,6 +8,7 @@ const app = express();
 const errorHandler = require('./api/middleware/errorHandler');
 const PostRouter = require("./api/routes/posts");
 const UserRouter = require("./api/routes/users");
+const CommentRouter = require('./api/routes/comments');
 
 mongoose.Promise = global.Promise;
 mongoose.connect(config.DATABASE);
@@ -24,7 +25,8 @@ app.use((req, res, next) => {
 app.use(express.static(path.resolve(__dirname, '../dist')))
 
 app.use("/api/u", UserRouter);
-app.use("/api", PostRouter);
+app.use("/api/p", PostRouter);
+// app.use('/api/comments', CommentRouter)
 
 app.use((req, res, next) => {
   let err = new Error("Whoops! Looks like something went horribly, horribly wrong here!");

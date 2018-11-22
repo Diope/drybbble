@@ -2,6 +2,7 @@ const express = require('express');
 const router = express.Router();
 
 const {Post} = require('../../models/Post');
+const {Comment} = require('../../models/Comment');
 const {User} = require('../../models/User');
 const auth = require('../middleware/auth');
 
@@ -28,11 +29,22 @@ const parser = multer({storage: storage})
 
 // GET:
   // All Shots
-router.get('/', (req, res) => {
-  Post.find({}).limit(20).exec((err, results) => {
-    if (err) return res.status(400).json({message: "There is an error", err})
-    res.status(200).send(results)
-  })
+router.get('/', async (req, res, next) => {
+  let post = await Post.find({}).limit(20)
+
+  try {
+    if (post === null || !post) {
+      return next({status: 400, message: "Will redirect to hero or gen error"})
+    }
+    return res.status(200).json(post)
+  } catch (err) {
+    next(err)
+  }
+
+  // Post.find({}).limit(20).exec((err, results) => {
+  //   if (err) return res.status(400).json({message: "There is an error", err})
+  //   res.status(200).send(results)
+  // })
 });
 
   // Individual
@@ -70,19 +82,47 @@ router.post('/new', auth, parser.single('userShot'), (req, res) => {
   .catch((err) => res.status(200).json(err))
 })
 
-router.post('/comment/:id', auth, (req, res) => {
+router.post('/comments/:id', auth, async (req, res, next) => {
   let id = req.params.id;
-  User.findById(req.user.id).then((user) => {
-    Post.find({_id: id}).then((post) => {
-      console.log(post[0])
-      const comment = {
-        body: req.body.body,
-        user: req.user.id
-      }
-      post[0].comments.unshift(comment)
-      post[0].save().then((result) => res.json(result))
-    }).catch((err) => console.log(err))
-  }).catch((err) => res.status(200).json({message: "Error 2"}))
+  let opt = {path: 'user', select: ['id', 'username']}
+
+  let _user = await User.findById(req.user.id)
+  let post = await Post.findOne({_id: id}).populate(opt)
+  const comment = {body: req.body.body, user: req.user.id }
+
+
+  try {
+    if (post === null || !post) {
+      return next({status: 400, message: "Zoinks, seems that post doesn't exist!"})
+    } else if (_user === null || !_user) {
+      return next({status:401, message: "Uh oh, it seems you're not authorized to do that Starfox, perhaps you need to log in?"})
+    }
+    post.comments.unshift(comment)
+    console.log(post.comments[1])
+    // post.save()
+  } catch (err) {
+    next(err)
+  }
+
+  // User.findById(req.user.id).then((user) => {
+  //   Post.findOne({_id: id}).then((post) => {
+  //     console.log(post[0])
+  //     const comment = {
+  //       body: req.body.body,
+  //       user: req.user.id
+  //     }
+  //     post.comments.unshift(comment)
+  //     post.save().then((result) => res.json(result))
+  //   }).catch((err) => console.log(err))
+  // }).catch((err) => res.status(200).json({message: "Error 2"}))
+})
+
+router.get('/comments/:id', async (req, res, next) => {
+  let id = req.params.id
+
+  let comment = await Comment.findById({_id: id})
+
+  console.log(comment)
 })
 
 // UPDATE: // find returns an array, findBy* returns an object. You cannot do PUT/PATCH requests with multer
