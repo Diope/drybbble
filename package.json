@@ -20,6 +20,9 @@
     "start": "nodemon server.js"
   },
   "devDependencies": {
-    "mocha": "5.2.0"
+    "chai": "4.2.0",
+    "mocha": "5.2.0",
+    "sinon": "7.1.1",
+    "sinon-mongoose": "2.2.1"
   }
 }
