@@ -16,6 +16,11 @@ If possible much like my Rails Dribbble clone, I will look into account informat
 
 ## Changelog
 
+### General October/November updates:
+* Seems you cannot use multer on PUT/PATCH requests, so editing a post to change the photo is out until I can find a way around this.
+* Added libraries for testing.
+* Refactored many of the requests to be async/await instead of .then/.catch
+
 ### Sept 28:
 * Image uploading has been added for posts, using Cloudinary for image hosting in lieu of storing locally. Unfortunately I'm having issues in regards to updating the user profile, avatar and background. 
 
