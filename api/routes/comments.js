@@ -6,7 +6,7 @@ const {User} = require('../../models/User');
 const auth = require('../middleware/auth');
 
 router.post('/comment/:id', auth, async (req, res, next) => {
-  let id = req.params.id;
+  const {id} = req.params
   // let opt = {path: 'user', select: [ 'id', 'username']}
 
   let _user = await User.findById(req.user.id)
@@ -19,6 +19,8 @@ router.post('/comment/:id', auth, async (req, res, next) => {
     } else if (_user === null || !_user) {
       return next({status:401, message: "Uh oh, it seems you're not authorized to do that Starfox, perhaps you need to log in?"})
     }
+    post.comments.unshift(comment)
+    await post.save()
     console.log(post)
   } catch (err) {
     next(err)

@@ -2,7 +2,7 @@ const express = require('express');
 const router = express.Router();
 
 const {Post} = require('../../models/Post');
-const {Comment} = require('../../models/Comment');
+// const {Comment} = require('../../models/Comment');
 const {User} = require('../../models/User');
 const auth = require('../middleware/auth');
 
@@ -61,30 +61,45 @@ router.get('/:slug', (req, res) => {
 // POST:
 
   // New
-router.post('/new', auth, parser.single('userShot'), (req, res) => {
+router.post('/new', auth, parser.single('userShot'), async (req, res, next) => {
+  const {title, body} = req.body;
+  const {url, public_id} = req.file;
+  const newPost = { title, body, user: req.user.id, userShot: {url, public_id}};
+  let _user = await User.findById(req.user.id);
 
-  console.log(req.body)
-  User.findById(req.user.id).then((user) => {
-    const newPost = {
-      title: req.body.title,
-      body: req.body.body,
-      user: req.user.id,
-      userShot: {url: req.file.url, public_id: req.file.public_id}
+  try {
+    if (_user === null || !_user) {
+      return next({status: 400, message: "Whoops, make this make sense later"})
     }
-    Post.create(newPost).then((post) => {
-      user.posts.push(post)
-      user.save()
-      .then((result) => res.status(200).json({message: "Shot successful!"}))
-      .catch((err) => res.status(400).json(err))
-    })
-    .catch((err) => res.status(200).json(err))
-  })
-  .catch((err) => res.status(200).json(err))
+    let _post = await Post.create(newPost)
+    _user.posts.push(_post)
+    await _user.save()
+    return res.status(200).json({message: "Shot successful"})
+  } catch (err) {
+    next(err)
+  }
+  
+  // User.findById(req.user.id).then((user) => {
+  //   const newPost = {
+  //     title: req.body.title,
+  //     body: req.body.body,
+  //     user: req.user.id,
+  //     userShot: {url: req.file.url, public_id: req.file.public_id}
+  //   }
+  //   Post.create(newPost).then((post) => {
+  //     user.posts.push(post)
+  //     user.save()
+  //     .then((result) => res.status(200).json({message: "Shot successful!"}))
+  //     .catch((err) => res.status(400).json(err))
+  //   })
+  //   .catch((err) => res.status(200).json(err))
+  // })
+  // .catch((err) => res.status(200).json(err))
 })
 
 router.post('/comments/:id', auth, async (req, res, next) => {
-  let id = req.params.id;
-  let opt = {path: 'user', select: ['id', 'username']}
+  let {id} = req.params;
+  let opt = {path: 'user', select: ['id', 'username', 'avatar']}
 
   let _user = await User.findById(req.user.id)
   let post = await Post.findOne({_id: id}).populate(opt)
@@ -117,41 +132,52 @@ router.post('/comments/:id', auth, async (req, res, next) => {
   // }).catch((err) => res.status(200).json({message: "Error 2"}))
 })
 
-router.get('/comments/:id', async (req, res, next) => {
+UPDATE: // find returns an array, findBy* returns an object. You cannot do PUT/PATCH requests with multer
+router.post('/:id', auth, parser.single('userShot'), async (req, res, next) => {
   let id = req.params.id
+  let _user = await User.findById(req.user.id)
 
-  let comment = await Comment.findById({_id: id})
+  try {
+    let _post = await Post.findById({_id: id})
+    if (_post.user.toString() != req.user.id) {
+      return next({status: 401, message: "You are not authorized to edit this shot"})
+    }
+    _post.title = req.body.title
+    _post.body = req.body.body
+    _post.userShot[0].public_id = req.file.public_id
+    _post.userShot[0].url = req.file.url
 
-  console.log(comment)
-})
+    await _post.save()
+    return res.status(200).json({message: "Your shot has been updated!"})
+  } catch (err) {
+    next(err)
+  }
 
-// UPDATE: // find returns an array, findBy* returns an object. You cannot do PUT/PATCH requests with multer
-// router.put('/:id', auth, parser.single('userShot'), (req, res) => {
-//   let id = req.params.id
-//   console.log(req.file)
-//   User.findById(req.user.id, (err, user) => {
-//     Post.findById({_id: id}).then((post) => {
-//       if (post.user.toString() !== req.user.id) {
-//         return res.status(200).json({message: "You are not authorized to edit this shot"})
-//       }
-//       post.title = req.body.title
-//       post.body = req.body.body
-//       // post.userShot[0].url = req.file.url
-//       // post.userShot[0].public_id = req.file.public_id
+
+  // User.findById(req.user.id, (err, user) => {
+  //   Post.findById({_id: id}).then((post) => {
+  //     if (post.user.toString() !== req.user.id) {
+  //       return res.status(200).json({message: "You are not authorized to edit this shot"})
+  //     }
+  //     post.title = req.body.title
+  //     post.body = req.body.body
       
-//       // const userShot = {
-//       //   userShot: {url: req.file.url, public_id: req.file.public_id}
-//       // }
+  //     // post.userShot[0].url = req.file.url
+  //     // post.userShot[0].public_id = req.file.public_id
+      
+  //     // const userShot = {
+  //     //   userShot: {url: req.file.url, public_id: req.file.public_id}
+  //     // }
 
-//       // console.log(userShot)
-//       // console.log(post.userShot)
-//       // console.log(req.body)
-//       // post.save()
-//       //   .then((result) => console.log("yatta"))
-//       //   .catch(err => console.log(err.message))
-//     }).catch(err => console.log(err))
-//   })
-// });
+  //     // console.log(userShot)
+  //     // console.log(post.userShot)
+  //     // console.log(req.body)
+  //     // post.save()
+  //     //   .then((result) => console.log("yatta"))
+  //     //   .catch(err => console.log(err.message))
+  //   }).catch(err => console.log(err))
+  // })
+});
 
 // DELETE:
 

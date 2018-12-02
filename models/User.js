@@ -22,9 +22,9 @@ const UserSchema = new Schema({
   },
   email: {
     type: String,
-    required: true,
+    required: [true, "Email is required to sign up to Drybbble"],
     validate: [
-      /^(([^<>()\[\]\\.,;:\s@"]+(\.[^<>()\[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/, "Email is not valid, please enter a valid email"
+      /^(([^<>()\[\]\\.,;:\s@"]+(\.[^<>()\[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/, "Email is not formatted correctly, please check the email and try again"
     ],
     lowercase: true,
     index: true,
@@ -36,7 +36,6 @@ const UserSchema = new Schema({
     minlength: 6
   },
   posts: [{type: Schema.Types.ObjectId, ref: 'Post'}],
-  comments: [{type: Schema.Types.ObjectId, ref: 'Comment'}],
   profile: {
     website: {type: String, validate: [
       /^((https?|ftp|smtp):\/\/)?(www.)?[a-z0-9]+\.[a-z]+(\/[a-zA-Z0-9#]+\/?)*$/,  "URL not valid, please enter a valid URL"
