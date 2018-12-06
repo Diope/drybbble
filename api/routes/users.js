@@ -17,9 +17,9 @@ cloudinary.config({
 
 const storage = cloudinaryStorage({
   cloudinary: cloudinary,
-  folder: 'drybbble_uploads/avatars',
+  folder: 'drybbble_uploads/avatar',
   allowed_formats: ['jpeg', 'jpg', 'png', 'gif'],
-  transformation: [{ width: 90, height: 90, crop: "imagga_scale" }]
+  transformation: [{ width: 90, height: 90, transformation: "croptest" }]
 })
 
 const parser = multer({storage: storage})
@@ -117,11 +117,26 @@ router.get('/:user', async (req, res, next) => {
   // }).catch(err => console.log(err))
 })
 
-// Update Profile
+// UPDATE: 
 
-// router.put('/:id', auth, parser.single('avatar'), (req, res) => {
-//   console.log(req)
-// })
+router.post('/:id', auth, parser.single('avatar'), async (req, res, next) => {
+  const {id} = req.params
+  let _user = await User.findById({_id: id})
+  try {
+    if (_user === null || !_user) {
+      return next({status: 400, message: "I can't let you do that Starfox, please log in first"})
+    }
+    if (req.file) {
+      _user.avatar.url = req.file.url
+      _user.avatar.public_id = req.file.public_id
+    }
+    await _user.updateOne({$set:(req.body)})
+    await _user.save();
+    console.log(_user);
+  } catch (err) {
+    next(err)
+  }
+})
 
 
 // DELETE:
@@ -137,7 +152,7 @@ router.delete("/:id", auth, async (req, res, next) => {
     } else if (_user._id.toString() !== req.user.id) {
       return next({status: 401, message: "Oops, you're not authorized to do that Starfox"})
     } else if (_user._id.toString() === req.user.id) {
-      // _user.delete()
+      await _user.delete()
       return res.status(200).json({message: "Your account has been deleted"})
     }
   } catch (err) {
@@ -165,5 +180,10 @@ router.delete("/:id", auth, async (req, res, next) => {
   //   //   .json({ message: "Sorry to see you go! Your account has been successfully deleted" })
   // }).catch(err => res.status(400).json({message: "Uh oh, it seems something went wrong!", error: err}));
 });
+
+use = async (id) => {
+  let _user = await User.findById({_id: id})
+  return await _user
+}
 
 module.exports = router;

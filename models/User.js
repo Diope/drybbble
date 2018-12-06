@@ -44,16 +44,15 @@ const UserSchema = new Schema({
       trim: true
     },
     forHire: {type: Boolean, default: false},
-    location: {type: String, maxlength: 40 },
-    bio: {type: String, maxlength: 500}
+    location: {type: String, maxlength: 40, default: "Designville, CA" },
+    bio: {type: String, maxlength: 500, default: "Design is my life, but this is my story"}
   },
-  avatar: [
+  avatar: 
     {
       url: {type: String, default: '/static/img/defaultAvatar.png'},
       public_id: {type: String}
-    }
-  ],
-  background: {
+    },
+  header: {
     url:{type: String, default: "/static/img/defaultBG.png"},
     public_id: {type: String}
   }

@@ -142,10 +142,12 @@ router.post('/:id', auth, parser.single('userShot'), async (req, res, next) => {
     if (_post.user.toString() != req.user.id) {
       return next({status: 401, message: "You are not authorized to edit this shot"})
     }
+    if (req.file){
+      _post.userShot[0].public_id = req.file.public_id
+      _post.userShot[0].url = req.file.url
+    }
     _post.title = req.body.title
     _post.body = req.body.body
-    _post.userShot[0].public_id = req.file.public_id
-    _post.userShot[0].url = req.file.url
 
     await _post.save()
     return res.status(200).json({message: "Your shot has been updated!"})
@@ -210,5 +212,7 @@ router.delete('/:slug', auth, async (req, res, next) => {
   //   }).catch((err) => res.status(400).json("Could not find post, perhaps it's been deleted?"))
   // })
 })
+
+
 
 module.exports = router;
