@@ -1,8 +1,8 @@
 import React, { Component } from 'react';
 
 class RegisterForm extends Component {
-  constructor() {
-    super();
+  constructor(props) {
+    super(props);
     this.state = { 
       email: "",
       username: "",
@@ -33,9 +33,11 @@ class RegisterForm extends Component {
   }
 
   render() { 
+    const {heading, buttonText, SignUp} = this.props
+    const {username, email, password, password_confirm} = this.state
     return ( 
       <div className="container" style={{ marginTop: '50px', width: '700px'}}>
-            <h2 style={{marginBottom: '40px'}}>Registration</h2>
+            <h2 style={{marginBottom: '40px'}}>{heading}</h2>
             <form onSubmit={ this.handleSubmit }>
                 <label htmlFor="username">Username</label>
                 <div className="form-group">
@@ -45,21 +47,25 @@ class RegisterForm extends Component {
                     className="form-control"
                     name="username"
                     onChange={ this.handleInputChange }
-                    value={ this.state.username }
+                    value={ username }
                     />
                 </div>
-                <label htmlFor="email">Email</label>
-                <div className="form-group">
-                    <input
-                    type="email"
-                    placeholder="ex: user@example.com"
-                    className="form-control"
-                    name="email"
-                    onChange={ this.handleInputChange }
-                    value={ this.state.email }
-                    />
-                </div>
-                <label htmlFor="passwoord">Password</label>
+                {SignUp && (
+                    <React.Fragment>
+                        <label htmlFor="email">Email</label>
+                        <div className="form-group">
+                            <input
+                            type="email"
+                            placeholder="ex: user@example.com"
+                            className="form-control"
+                            name="email"
+                            onChange={ this.handleInputChange }
+                            value={ email }
+                            />
+                        </div>
+                    </React.Fragment>
+                )}
+                <label htmlFor="password">Password</label>
                 <div className="form-group">
                     <input
                     type="password"
@@ -67,23 +73,27 @@ class RegisterForm extends Component {
                     className="form-control"
                     name="password"
                     onChange={ this.handleInputChange }
-                    value={ this.state.password }
+                    value={ password }
                     />
                 </div>
-                <label htmlFor="password_confirm">Confirm Password</label>
-                <div className="form-group">
-                    <input
-                    type="password"
-                    placeholder="Confirm Password"
-                    className="form-control"
-                    name="password_confirm"
-                    onChange={ this.handleInputChange }
-                    value={ this.state.password_confirm }
-                    />
-                </div>
+                {SignUp && (
+                    <React.Fragment>
+                        <label htmlFor="password_confirm">Confirm Password</label>
+                        <div className="form-group">
+                            <input
+                            type="password"
+                            placeholder="Confirm Password"
+                            className="form-control"
+                            name="password_confirm"
+                            onChange={ this.handleInputChange }
+                            value={ password_confirm }
+                            />
+                        </div>
+                    </React.Fragment>
+                )}
                 <div className="form-group">
                     <button type="submit" className="btn btn-primary">
-                        Sign Up
+                        {buttonText}
                     </button>
                 </div>
             </form>
