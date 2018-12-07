@@ -1,6 +1,12 @@
 import React, { Component } from 'react';
+import { connect } from 'react-redux';
+import PropTypes from 'prop-types';
+import { withRouter } from 'react-router-dom';
+import classnames from 'classnames';
 
-class RegisterForm extends Component {
+import {registerUser} from '../store/actions/authentication_action';
+
+class AuthForm extends Component {
   constructor(props) {
     super(props);
     this.state = { 
@@ -29,26 +35,37 @@ class RegisterForm extends Component {
       password: this.state.password,
       password_confirm: this.state.password_confirm
     }
-    console.log(user)
+    this.props.registerUser(user, this.props.history)
+  }
+
+  componentWillReceiveProps(nextProps) {
+      if(nextProps.errors) {
+          this.setState({
+              errors: nextProps.errors
+          })
+      }
   }
 
   render() { 
     const {heading, buttonText, SignUp} = this.props
-    const {username, email, password, password_confirm} = this.state
+    const {username, email, password, password_confirm, errors} = this.state
     return ( 
       <div className="container" style={{ marginTop: '50px', width: '700px'}}>
-            <h2 style={{marginBottom: '40px'}}>{heading}</h2>
+            <h1 style={{marginBottom: '40px'}}>{heading}</h1>
             <form onSubmit={ this.handleSubmit }>
                 <label htmlFor="username">Username</label>
                 <div className="form-group">
                     <input
                     type="text"
-                    placeholder="Username"
-                    className="form-control"
+                    placeholder="ex: JohnnyBravo95"
+                    className={classnames('form-control form-control-lg', {
+                        'is-invalid': errors.username
+                    })}
                     name="username"
                     onChange={ this.handleInputChange }
                     value={ username }
                     />
+                    {errors.username && (<div className="invalid-feedback">{errors.username}</div>)}
                 </div>
                 {SignUp && (
                     <React.Fragment>
@@ -57,11 +74,14 @@ class RegisterForm extends Component {
                             <input
                             type="email"
                             placeholder="ex: user@example.com"
-                            className="form-control"
+                            className={classnames('form-control form-control-lg', {
+                                'is-invalid': errors.email
+                            })}
                             name="email"
                             onChange={ this.handleInputChange }
                             value={ email }
                             />
+                            {errors.email && (<div className="invalid-feedback">{errors.email}</div>)}
                         </div>
                     </React.Fragment>
                 )}
@@ -70,11 +90,14 @@ class RegisterForm extends Component {
                     <input
                     type="password"
                     placeholder="Password"
-                    className="form-control"
+                    className={classnames('form-control form-control-lg', {
+                        'is-invalid': errors.password
+                    })}
                     name="password"
                     onChange={ this.handleInputChange }
                     value={ password }
                     />
+                    {errors.password && (<div className="invalid-feedback">{errors.password}</div>)}
                 </div>
                 {SignUp && (
                 <React.Fragment>
@@ -83,11 +106,14 @@ class RegisterForm extends Component {
                         <input
                         type="password"
                         placeholder="Confirm Password"
-                        className="form-control"
+                        className={classnames('form-control form-control-lg', {
+                            'is-invalid': errors.password_confirm
+                        })}
                         name="password_confirm"
                         onChange={ this.handleInputChange }
                         value={ password_confirm }
                         />
+                        {errors.password_confirm && (<div className="invalid-feedback">{errors.password_confirm}</div>)}
                     </div>
                 </React.Fragment>
                 )}
@@ -101,5 +127,13 @@ class RegisterForm extends Component {
      );
   }
 }
+
+const mapStateToProps = state => ({
+    errors: state.errors
+})
+
+AuthForm.propTypes = {
+    registerUser: PropTypes.func.isRequired
+}
  
-export default RegisterForm;
+export default connect(mapStateToProps,{registerUser})(withRouter(AuthForm));

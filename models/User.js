@@ -78,24 +78,33 @@ UserSchema.pre('save', function(next) {
 
 UserSchema.post('save', function(err, doc, next) {
   var user = this;
-  if (user.isModified('username')) {
-    if (user.username.length <= 2) {
-      next(new Error("The username must be at least 3 characters in length"))
-    } else {
-      next()
+  try {
+    if (user.isModified('username')) {
+      if (user.username.length <= 2) {
+        return next({status: 400, status:"The username must be at least 3 characters in length"})
+      } else {
+        next()
+      }
     }
+  } catch (err) {
+    next(err)
   }
 })
 
 UserSchema.post('save', function(err, doc, next) {
   var user = this;
   var email = new RegExp(/^((https?|ftp|smtp):\/\/)?(www.)?[a-z0-9]+\.[a-z]+(\/[a-zA-Z0-9#]+\/?)*$/);
-  if (user.isModified('email')) {
-    if (email.test(user.email) === false) {
-      next(new Error(`The email ${user.email} is not a valid email, please enter a valid email`))
-    } else {
-      next()
-    }
+
+  try {
+    if (user.isModified('email')) {
+      if (email.test(user.email) === false) {
+        return next({status:400, message:`The email ${user.email} is not a valid email, please enter a valid email`})
+      } else {
+        next()
+      }
+    } 
+  } catch (err) {
+    next(err)
   }
 })
 
