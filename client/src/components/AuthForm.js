@@ -12,7 +12,7 @@ class RegisterForm extends Component {
      }
 
      this.handleInputChange = this.handleInputChange.bind(this);
-     this.handleSubmit = this.handleInputChange.bind(this)
+     this.handleSubmit = this.handleSubmit.bind(this)
   }
 
   handleInputChange(e) {
@@ -24,10 +24,10 @@ class RegisterForm extends Component {
   handleSubmit(e){
     e.preventDefault()
     const user = {
-      username: this.username,
-      email: this.email,
-      password: this.password,
-      password_confirm: this.password_confirm
+      username: this.state.username,
+      email: this.state.email,
+      password: this.state.password,
+      password_confirm: this.state.password_confirm
     }
     console.log(user)
   }
@@ -77,19 +77,19 @@ class RegisterForm extends Component {
                     />
                 </div>
                 {SignUp && (
-                    <React.Fragment>
-                        <label htmlFor="password_confirm">Confirm Password</label>
-                        <div className="form-group">
-                            <input
-                            type="password"
-                            placeholder="Confirm Password"
-                            className="form-control"
-                            name="password_confirm"
-                            onChange={ this.handleInputChange }
-                            value={ password_confirm }
-                            />
-                        </div>
-                    </React.Fragment>
+                <React.Fragment>
+                    <label htmlFor="password_confirm">Confirm Password</label>
+                    <div className="form-group">
+                        <input
+                        type="password"
+                        placeholder="Confirm Password"
+                        className="form-control"
+                        name="password_confirm"
+                        onChange={ this.handleInputChange }
+                        value={ password_confirm }
+                        />
+                    </div>
+                </React.Fragment>
                 )}
                 <div className="form-group">
                     <button type="submit" className="btn btn-primary">
