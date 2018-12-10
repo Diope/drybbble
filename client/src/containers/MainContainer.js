@@ -9,7 +9,7 @@ const MainContainer = () => {
     <div className="container">
       <Switch>
         <Route exact path="/" component={HomePage} />
-        <Route exact path="/new" render={props =>{
+        <Route exact path="/signup" render={props =>{
           return (
           <AuthForm
             heading="Welcome to Drybbble"

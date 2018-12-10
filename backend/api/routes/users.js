@@ -4,6 +4,9 @@ const auth = require('../middleware/auth')
 
 const { User } = require("../../models/User");
 
+const validateRegisterInput = require('../validation/register');
+const validateLoginInput = require('../validation/login');
+
 const multer = require("multer");
 const cloudinary = require("cloudinary");
 const cloudinaryStorage = require("multer-storage-cloudinary");
@@ -32,16 +35,18 @@ const parser = multer({storage: storage})
 router.post("/register", async (req, res, next) => {
   const username = req.body.username
   const email = req.body.email
+  const { errors, isValid } = validateRegisterInput(req.body);
+  if(!isValid) {
+      return res.status(400).json(errors);
+  }
 
   let _user = await User.findOne({$or:[{username}, {email}]})
-
-  console.log(_user)
 
   try {
     if (null != _user) {
       if (email === _user.email) {
         return next({status: 400, message: `The email ${email} is already in use, please choose another`})
-      } else if( username === _user.username) {
+      }else if( username === _user.username) {
         return next({status: 409, message: `The username ${username} is already in use please choose another.`})
       }
     }
@@ -69,6 +74,12 @@ router.post("/register", async (req, res, next) => {
 });
 
 router.post("/login", (req, res) => {
+  const { errors, isValid } = validateLoginInput(req.body);
+
+    if(!isValid) {
+        return res.status(400).json(errors);
+    }
+
 
   User.findOne({ username: req.body.username }, function(err, user) {
     if (!user) {

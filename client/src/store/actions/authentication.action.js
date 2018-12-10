@@ -3,8 +3,9 @@ import {GET_ERRORS} from '../_constants/actionTypes';
 
 export const registerUser = (user,history) => dispatch => {
   axios.post('api/u/register', user)
-    .then(res => history.push('/login'))
+    .then(res => history.push('/signin'))
     .catch(err => {
+      console.log(err.response.data)
       dispatch({
         type: GET_ERRORS,
         payload:err.response.data
@@ -12,9 +13,9 @@ export const registerUser = (user,history) => dispatch => {
     })
 }
 
-export const loginUser = (user) => dispatch => {
+export const loginUser = (user, history) => dispatch => {
   axios.post('api/u/login', user)
-    .then(res => {console.log(res.data);})
+    .then(res => history.push("/"))
     .catch(err => {
       dispatch({
         type: GET_ERRORS,

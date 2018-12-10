@@ -1,14 +1,14 @@
 const express = require("express");
 const mongoose = require("mongoose");
 const bodyParser = require("body-parser");
-const config = require("./config/config").get(process.env.NODE_ENV);
+const config = require("./backend/config/config").get(process.env.NODE_ENV);
 const path = require('path');
 const app = express();
 
-const errorHandler = require('./api/middleware/errorHandler');
-const PostRouter = require("./api/routes/posts");
-const UserRouter = require("./api/routes/users");
-const CommentRouter = require('./api/routes/comments');
+const errorHandler = require('./backend/api/middleware/errorHandler');
+const PostRouter = require("./backend/api/routes/posts");
+const UserRouter = require("./backend/api/routes/users");
+const CommentRouter = require('./backend/api/routes/comments');
 
 mongoose.Promise = global.Promise;
 mongoose.connect(config.DATABASE);

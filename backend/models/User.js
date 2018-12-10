@@ -14,18 +14,18 @@ const UserSchema = new Schema({
   username: {
     type: String,
     required: true,
-    minlength: [3, "Username must be at least 3 characters long"],
-    maxlength: [25, "Username must be no longer than 25 characters"],
+    // minlength: [3, "Username must be at least 3 characters long"],
+    // maxlength: [25, "Username must be no longer than 25 characters"],
     index: [true, "Username is already in use, please try another"],
     unique: true,
     trim: true
   },
   email: {
     type: String,
-    required: [true, "Email is required to sign up to Drybbble"],
-    validate: [
-      /^(([^<>()\[\]\\.,;:\s@"]+(\.[^<>()\[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/, "Email is not formatted correctly, please check the email and try again"
-    ],
+    // required: [true, "Email is required to sign up to Drybbble"],
+    // validate: [
+    //   /^(([^<>()\[\]\\.,;:\s@"]+(\.[^<>()\[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/, "Email is not formatted correctly, please check the email and try again"
+    // ],
     lowercase: true,
     index: true,
     unique: true
@@ -76,36 +76,33 @@ UserSchema.pre('save', function(next) {
   }
 });
 
-UserSchema.post('save', function(err, doc, next) {
-  var user = this;
-  try {
-    if (user.isModified('username')) {
-      if (user.username.length <= 2) {
-        return next({status: 400, status:"The username must be at least 3 characters in length"})
-      } else {
-        next()
-      }
-    }
-  } catch (err) {
-    next(err)
-  }
-})
+// UserSchema.post('save', function(err, doc, next) {
+//   var user = this;
+//     if (user.isModified('username')) {
+//       if (user.username.length <= 2) {
+//         return next({status: 400, status:"The username must be at least 3 characters in length"})
+//       } else {
+//         next()
+//       }
+//     }
+//     if (err) {
+//       return next(err)
+//     }
+// })
 
 UserSchema.post('save', function(err, doc, next) {
   var user = this;
   var email = new RegExp(/^((https?|ftp|smtp):\/\/)?(www.)?[a-z0-9]+\.[a-z]+(\/[a-zA-Z0-9#]+\/?)*$/);
 
-  try {
-    if (user.isModified('email')) {
-      if (email.test(user.email) === false) {
-        return next({status:400, message:`The email ${user.email} is not a valid email, please enter a valid email`})
-      } else {
-        next()
-      }
-    } 
-  } catch (err) {
-    next(err)
-  }
+  if (err) return next(err)
+  if (user.isModified('email')) {
+    if (email.test(user.email) === false) {
+      return next({status:400, message:`The email ${user.email} is not a valid email, please enter a valid email`})
+    } else {
+      next()
+    }
+  } 
+
 })
 
 

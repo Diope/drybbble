@@ -4,11 +4,11 @@ import PropTypes from 'prop-types';
 import { withRouter } from 'react-router-dom';
 import classnames from 'classnames';
 
-import {registerUser} from '../store/actions/authentication_action';
+import {registerUser, loginUser} from '../store/actions/authentication.action';
 
 class AuthForm extends Component {
-  constructor(props) {
-    super(props);
+  constructor() {
+    super();
     this.state = { 
       email: "",
       username: "",
@@ -38,22 +38,24 @@ class AuthForm extends Component {
     this.props.registerUser(user, this.props.history)
   }
 
-  componentWillReceiveProps(nextProps) {
-      if(nextProps.errors) {
-          this.setState({
-              errors: nextProps.errors
-          })
-      }
-  }
+    componentWillReceiveProps (nextprops) {
+        if(nextprops.errors !== this.state.errors) {
+            this.setState({
+                errors: nextprops.errors
+            });
+        }
+    }
+
 
   render() { 
     const {heading, buttonText, SignUp} = this.props
-    const {username, email, password, password_confirm, errors} = this.state
+    const {username, email, password, password_confirm, errors} = this.state;
+
     return ( 
       <div className="container" style={{ marginTop: '50px', width: '700px'}}>
             <h1 style={{marginBottom: '40px'}}>{heading}</h1>
             <form onSubmit={ this.handleSubmit }>
-                <label htmlFor="username">Username</label>
+                <label htmlFor="username">{username}</label>
                 <div className="form-group">
                     <input
                     type="text"
@@ -128,12 +130,12 @@ class AuthForm extends Component {
   }
 }
 
-const mapStateToProps = state => ({
-    errors: state.errors
-})
-
 AuthForm.propTypes = {
     registerUser: PropTypes.func.isRequired
 }
- 
-export default connect(mapStateToProps,{registerUser})(withRouter(AuthForm));
+
+const mapStateToProps = (state) => ({
+    errors: state.errors,
+})
+
+export default connect(mapStateToProps,{ registerUser })(withRouter(AuthForm))
