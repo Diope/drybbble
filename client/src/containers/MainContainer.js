@@ -2,16 +2,17 @@ import React from 'react';
 import {Switch, Route } from 'react-router-dom'
 
 import HomePage from '../components/HomePage'
-import AuthForm from '../components/AuthForm'
+import RegisterForm from '../components/RegisterForm'
+import LoginForm from '../components/LoginForm';
 
 const MainContainer = () => {
   return ( 
     <div className="container">
       <Switch>
         <Route exact path="/" component={HomePage} />
-        <Route exact path="/signup" render={props =>{
+        <Route exact path="/new" render={props =>{
           return (
-          <AuthForm
+          <RegisterForm
             heading="Welcome to Drybbble"
             buttonText="Sign Up"
             SignUp
@@ -21,7 +22,7 @@ const MainContainer = () => {
       />
       <Route exact path="/signin" render={props => {
         return (
-          <AuthForm
+          <LoginForm
             heading="Sign In"
             buttonText="Log In"
           />

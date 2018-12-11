@@ -4,17 +4,15 @@ import PropTypes from 'prop-types';
 import { withRouter } from 'react-router-dom';
 import classnames from 'classnames';
 
-import {registerUser, loginUser} from '../store/actions/authentication.action';
+import {loginUser} from '../store/actions/authentication.action';
 
-class AuthForm extends Component {
+class LoginForm extends Component {
   constructor() {
     super();
     this.state = { 
-      email: "",
       username: "",
       password: "",
-      password_confirm: "",
-      errors: {}
+      errors: {},
      }
 
      this.handleInputChange = this.handleInputChange.bind(this);
@@ -31,11 +29,9 @@ class AuthForm extends Component {
     e.preventDefault()
     const user = {
       username: this.state.username,
-      email: this.state.email,
-      password: this.state.password,
-      password_confirm: this.state.password_confirm
+      password: this.state.password
     }
-    this.props.registerUser(user, this.props.history)
+    this.props.loginUser(user, this.props.history)
   }
 
     componentWillReceiveProps (nextprops) {
@@ -48,14 +44,14 @@ class AuthForm extends Component {
 
 
   render() { 
-    const {heading, buttonText, SignUp} = this.props
-    const {username, email, password, password_confirm, errors} = this.state;
+    const {heading, buttonText} = this.props
+    const {username, password, errors} = this.state;
 
     return ( 
       <div className="container" style={{ marginTop: '50px', width: '700px'}}>
             <h1 style={{marginBottom: '40px'}}>{heading}</h1>
             <form onSubmit={ this.handleSubmit }>
-                <label htmlFor="username">{username}</label>
+                <label htmlFor="username">Username</label>
                 <div className="form-group">
                     <input
                     type="text"
@@ -69,24 +65,7 @@ class AuthForm extends Component {
                     />
                     {errors.username && (<div className="invalid-feedback">{errors.username}</div>)}
                 </div>
-                {SignUp && (
-                    <React.Fragment>
-                        <label htmlFor="email">Email</label>
-                        <div className="form-group">
-                            <input
-                            type="email"
-                            placeholder="ex: user@example.com"
-                            className={classnames('form-control form-control-lg', {
-                                'is-invalid': errors.email
-                            })}
-                            name="email"
-                            onChange={ this.handleInputChange }
-                            value={ email }
-                            />
-                            {errors.email && (<div className="invalid-feedback">{errors.email}</div>)}
-                        </div>
-                    </React.Fragment>
-                )}
+              
                 <label htmlFor="password">Password</label>
                 <div className="form-group">
                     <input
@@ -101,24 +80,6 @@ class AuthForm extends Component {
                     />
                     {errors.password && (<div className="invalid-feedback">{errors.password}</div>)}
                 </div>
-                {SignUp && (
-                <React.Fragment>
-                    <label htmlFor="password_confirm">Confirm Password</label>
-                    <div className="form-group">
-                        <input
-                        type="password"
-                        placeholder="Confirm Password"
-                        className={classnames('form-control form-control-lg', {
-                            'is-invalid': errors.password_confirm
-                        })}
-                        name="password_confirm"
-                        onChange={ this.handleInputChange }
-                        value={ password_confirm }
-                        />
-                        {errors.password_confirm && (<div className="invalid-feedback">{errors.password_confirm}</div>)}
-                    </div>
-                </React.Fragment>
-                )}
                 <div className="form-group">
                     <button type="submit" className="btn btn-primary">
                         {buttonText}
@@ -130,12 +91,12 @@ class AuthForm extends Component {
   }
 }
 
-AuthForm.propTypes = {
-    registerUser: PropTypes.func.isRequired
+LoginForm.propTypes = {
+    loginUser: PropTypes.func.isRequired
 }
 
 const mapStateToProps = (state) => ({
-    errors: state.errors,
+    errors: state.errors
 })
 
-export default connect(mapStateToProps,{ registerUser })(withRouter(AuthForm))
+export default connect(mapStateToProps,{ loginUser })(withRouter(LoginForm))

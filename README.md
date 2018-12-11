@@ -16,7 +16,15 @@ If possible much like my Rails Dribbble clone, I will look into account informat
 
 ## Changelog
 
-### October 2nd
+## December 10
+* Ah I finally figured out why errors weren't displaying, in my `combinedReducer` I didn't set `errors` to `errorsReducer` as in `errors: errorsReducer` you can see how that would cause an issue when I'm looking for the related state called...`errors`.
+
+## December 6th
+* Added ability to edit user profile and refactored
+* Added client side via CRA and creating the basic UI elements (login, signup, general auth form)
+* Redux has been added as well, created store and and actions and reducers related to errors (easiest part to do atm)
+
+### December 2nd
 * Figured a way around multer not working with PUT/PATCH requests, thank you to my friend Jade who said random things that made me think of this.
 
 ### General October/November updates:

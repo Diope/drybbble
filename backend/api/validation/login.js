@@ -10,8 +10,8 @@ module.exports = function validateLoginInput(data) {
       errors.username = 'Username must be at least 3 characters in length';
     }
 
-    if(Validator.isEmpty(data.usrnamee)) {
-        errors.email = 'A username is required to sign up to Drybbble';
+    if(Validator.isEmpty(data.username)) {
+        errors.username = 'A username is required to sign up to Drybbble';
     }
 
     if(!Validator.isLength(data.password, {min: 6, max: 30})) {
