@@ -18,6 +18,18 @@ If possible much like my Rails Dribbble clone, I will look into account informat
 
 ## Changelog
 
+## December 13
+* Added post action and reducer to fetch all posts. Also fixed the React proxy issue that kept returning me 500 errors on the POST call. The issue is solved by expanding the proxy field to the following: 
+```
+"proxy": {
+    "/api/*":  {
+      "target": "http://localhost:3851/",
+      "secure": false
+    }
+  }
+```
+where target is what you have your server port pointed to.
+
 ## December 10
 * Ah I finally figured out why errors weren't displaying, in my `combinedReducer` I didn't set `errors` to `errorsReducer` as in `errors: errorsReducer` you can see how that would cause an issue when I'm looking for the related state called...`errors`.
 
