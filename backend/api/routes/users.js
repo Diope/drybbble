@@ -108,7 +108,7 @@ router.post("/login", (req, res) => {
 
 // GET:
 router.get('/:user', async (req, res, next) => {
-  let opt = {path: 'posts', select: ['id', 'title', 'body', 'userShot']}
+  let opt = {path:'posts', select: ['id', 'title', 'body', 'userShot']}
   let _user = req.params.user
   let user = await User.findOne({username: _user}).populate(opt)
 

@@ -4,7 +4,7 @@ import PropTypes from 'prop-types';
 import { withRouter } from 'react-router-dom';
 import classnames from 'classnames';
 
-import {registerUser, loginUser} from '../store/actions/authentication.action';
+import {registerUser} from '../store/actions/authentication.action';
 
 class RegisterForm extends Component {
   constructor() {
@@ -44,10 +44,19 @@ class RegisterForm extends Component {
   }
 
     componentWillReceiveProps (nextprops) {
+        if (nextprops.auth.isAuthenticated) {
+            this.props.history.push("/")
+        }
         if(nextprops.errors !== this.state.errors) {
             this.setState({
                 errors: nextprops.errors
             });
+        }
+    }
+
+    componentDidMount() {
+        if(this.props.auth.isAuthenticated) {
+            this.props.history.push('/');
         }
     }
 
@@ -137,11 +146,12 @@ class RegisterForm extends Component {
 
 RegisterForm.propTypes = {
     registerUser: PropTypes.func.isRequired,
-    // loginUser: PropTypes.func.isRequired
+    auth: PropTypes.object.isRequired
 }
 
 const mapStateToProps = (state) => ({
-    errors: state.errors
+    errors: state.errors,
+    auth: state.auth
 })
 
 export default connect(mapStateToProps,{ registerUser })(withRouter(RegisterForm))

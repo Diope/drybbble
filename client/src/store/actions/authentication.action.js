@@ -23,14 +23,21 @@ export const loginUser = (user, history) => dispatch => {
       setAuthToken(token)
       let decoded = jwt_decode(token)
       dispatch(setCurrentUser(decoded))
+      history.push("/")
     })
     .catch(err => {
-      console.log(err.response.data)
       dispatch({
         type: GET_ERRORS,
         payload: err.response.data
       })
     })
+}
+
+export const logOutUser = (history) => dispatch => {
+  localStorage.removeItem('jwtToken');
+  setAuthToken(false);
+  dispatch(setCurrentUser({}))
+  history.push("/login")
 }
 
 export const setCurrentUser = (decoded) => {

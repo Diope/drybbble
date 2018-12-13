@@ -29,14 +29,15 @@ const parser = multer({storage: storage})
 
 // GET:
   // All Shots
-router.get('/', async (req, res, next) => {
-  let post = await Post.find({}).limit(20)
+router.get('/all', async (req, res, next) => {
+  let opt = {path: 'user', select: ['avatar', 'username']}
+  let posts = await Post.find({}).limit(25).populate(opt)
 
   try {
-    if (post === null || !post) {
+    if (posts === null || !posts) {
       return next({status: 400, message: "Will redirect to hero or gen error"})
     }
-    return res.status(200).json(post)
+    return res.status(200).json(posts)
   } catch (err) {
     next(err)
   }

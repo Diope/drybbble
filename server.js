@@ -16,11 +16,15 @@ mongoose.connect(config.DATABASE);
 app.use(bodyParser.urlencoded({ extended: false }));
 app.use(bodyParser.json());
 app.use((req, res, next) => {
-  res.header(
-    "Access-Control-Allow-Headers",
-    "Origin, Authorization, Content-Type, Accept"
-  );
-  next();
+  res.header('Access-Control-Allow-Origin', '*');
+  res.header("Access-Control-Allow-Headers", "Origin, Authorization, Content-Type, X-Requested-With, Accept");
+  res.header('Access-Control-Allow-Methods', 'GET,PUT,POST,DELETE,OPTIONS');
+
+  if ('OPTIONS' == req.method) {
+    res.send(200);
+  } else {
+    next();
+  }
 });
 app.use(express.static(path.resolve(__dirname, '../dist')))
 

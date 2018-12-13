@@ -14,7 +14,12 @@
     "redux": "4.0.1",
     "redux-thunk": "2.3.0"
   },
-  "proxy": "http://localhost:3851/",
+  "proxy": {
+    "/api/*":  {
+      "target": "http://localhost:3851/",
+      "secure": false
+    }
+  },
   "scripts": {
     "start": "react-scripts start",
     "build": "react-scripts build",

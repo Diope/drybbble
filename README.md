@@ -5,6 +5,8 @@ This serves as a repository for my Dribbble clone made with MongoDB/Express/Reac
 ### Important Note
 Feel free to clone and use for your own use. In order for authentication to work, you will need to add two files to the config file. `private.key` & `public.key` then head over to [RSA Generator](http://travistidwell.com/jsencrypt/demo/) and copy and paste the output to the respective files, to include the key headers.
 
+I would like to take the time to say that some aspects would be WAY easier with an SQL database
+
 ## Intended 1.0 features
 
 The intended features on first go around are as follows:

@@ -1,7 +1,7 @@
 {
   "name": "drybbble",
   "version": "1.0.0",
-  "description": "dribbble clone created with Nodejs/Express/Either react or vue for the view layer",
+  "description": "dribbble clone created with Mongoose/Express/React/Node.js",
   "main": "index.js",
   "author": "Dion Pettaway",
   "license": "MIT",
